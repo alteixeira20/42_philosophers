@@ -1,125 +1,82 @@
-
 # 🍝 Philosophers
 
-> A concurrency simulation of the Dining Philosophers problem using threads, mutexes, processes, and semaphores, developed as part of the 42 Common Core curriculum.
+> A concurrent simulation of the Dining Philosophers problem, built with POSIX threads and mutexes as part of the 42 Common Core.
 
 ---
 
-## Overview
+## 📘 Problem Description
 
-**Philosophers** is a project that explores fundamental concepts of concurrent programming by modeling philosophers sharing forks around a table.  
-It provides practical experience with:
+The Dining Philosophers problem models a concurrency scenario where multiple philosophers sit at a circular table with one fork between each pair. Each philosopher cycles between **thinking**, **eating**, and **sleeping**.
 
-- Thread creation & synchronization
-- Mutex protection to avoid race conditions
-- Deadlock avoidance strategies
-- Process management & inter-process communication
-- Semaphore control for shared resources
+A philosopher must hold **two forks** (the one on their left and the one on their right) to eat. Forks are **shared resources** protected by mutexes to prevent data races.
 
-The simulation challenges you to ensure that no philosopher starves, while respecting strict timing and output requirements.
+The simulation must meet the following conditions:
 
----
+- **Precise Timing**:  
+  - All actions are timestamped in milliseconds since the simulation started.
+  - A philosopher **dies** if they don’t begin eating within `time_to_die` milliseconds since their last meal (or since the start).
+  - The death must be detected and reported **within 10 ms**.
 
-## 🛠 Tools & Concepts Learned
+- **Fork Access**:  
+  - Forks are mutex-protected to avoid simultaneous use.
+  - No philosopher can take both forks unless they are both available.
 
-This project required mastering several low-level system programming tools:
+- **Threaded Design**:  
+  - Each philosopher is represented as a **separate thread**.
+  - No global variables are allowed.
+  - Output must be **synchronized**, with no overlapping or interleaved log entries.
 
-### 🧵 Threads
-- Lightweight units of execution within the same process.
-- Created via `pthread_create()`.
-- Allow concurrent execution of multiple philosopher routines.
+- **Simulation Ends When**:
+  - A philosopher dies from starvation, **or**
+  - All philosophers have eaten at least `number_of_times_each_philosopher_must_eat` (if provided).
 
-### 🔒 Mutexes
-- Mutual exclusion primitives to protect shared resources (forks).
-- Used to avoid data races.
-- Functions used:
-  - `pthread_mutex_init()`
-  - `pthread_mutex_lock()`
-  - `pthread_mutex_unlock()`
-  - `pthread_mutex_destroy()`
-
-### 🧨 Processes *(Bonus)*
-- Independent memory spaces created via `fork()`.
-- Each philosopher becomes a separate process.
-- Requires careful parent-child process management via:
-  - `waitpid()`
-  - `kill()`
-  - `exit()`
-
-### ⚙️ Semaphores *(Bonus)*
-- Counting synchronization objects to control access to multiple resources.
-- Allow philosophers to collectively share forks via a semaphore counter.
-- Functions used:
-  - `sem_open()`
-  - `sem_wait()`
-  - `sem_post()`
-  - `sem_close()`
-  - `sem_unlink()`
-
----
-
-## ✅ Key Features
-
-- Precise millisecond timestamp logging:
-  ```
+- **Log Output Format** (one per line):
+  ```text
   timestamp_in_ms X has taken a fork
   timestamp_in_ms X is eating
   timestamp_in_ms X is sleeping
   timestamp_in_ms X is thinking
   timestamp_in_ms X died
-  ```
-- No global variables allowed
-- Robust handling of:
-  - One philosopher (edge case)
-  - Deadlock prevention
-  - Timely detection of starvation
-- Synchronized output to prevent overlapping logs
-- No memory leaks permitted
+---
+
+## Project Goal
+
+Implement a multithreaded simulation where:
+
+- Philosophers take forks, eat, sleep, and think in a loop.
+- Forks (shared resources) are accessed safely using **mutexes**.
+- The simulation logs all actions with precise timing and formatting.
+- Deaths from starvation are detected promptly.
+- The simulation ends when a philosopher dies or a goal is met.
 
 ---
 
-### 🔧 Running the Program
+## Key Concepts: Mutex & Threads</strong></summary>
 
-**Mandatory version (threads & mutexes):**
+### 🔒 What is a Mutex?
 
-```bash
-./philo number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]
-```
+A **mutex** (short for *mutual exclusion*) is a lock used to ensure that only **one thread at a time** can access a specific piece of code or resource — in this case, a **fork**.
 
-**Example:**
+Imagine a fork as a bathroom key: before a philosopher can use it (eat), they must "lock" it; when they're done, they "unlock" it so others can use it.
 
-```bash
-./philo 5 800 200 200 7
-```
+### Why Threads?
 
-**Arguments:**
+Each philosopher runs in their own **thread** so that they can act independently and concurrently. But since they share forks, we need mutexes to **protect fork access** from race conditions.
 
-- `number_of_philosophers`: Number of philosophers (and forks)
-- `time_to_die`: Time in ms before a philosopher dies if they don't eat
-- `time_to_eat`: Time in ms a philosopher spends eating
-- `time_to_sleep`: Time in ms a philosopher spends sleeping
-- `number_of_times_each_philosopher_must_eat`: (Optional) Ends simulation when all have eaten at least this many times
+### Key Functions
+<details>
+<summary><strong>Expand too see all functions</strong></summary>
 
-**Bonus version (processes & semaphores):**
+| Category         | Function                | Description                                      |
+|------------------|--------------------------|--------------------------------------------------|
+| Thread creation  | `pthread_create`         | Launches a new philosopher thread                |
+| Thread join      | `pthread_join`           | Waits for a thread to finish (used for cleanup)  |
+| Mutex setup      | `pthread_mutex_init`     | Initializes a mutex (e.g. for each fork)         |
+| Mutex locking    | `pthread_mutex_lock`     | Locks a mutex — waits if it's already locked     |
+| Mutex unlocking  | `pthread_mutex_unlock`   | Unlocks a mutex — allows others to access        |
+| Mutex cleanup    | `pthread_mutex_destroy`  | Destroys a mutex when it's no longer needed      |
+</details>
 
-```bash
-make bonus
-./philo_bonus [same arguments as above]
-```
-
----
-## ⚠️ Constraints
-
-- Must comply with the **42 Norm** coding style
-- Only the allowed standard C functions and POSIX APIs are permitted
-- Bonus part is only evaluated if the mandatory part is **100% correct**
+This combination of **threads** and **mutexes** allows safe and realistic concurrent behavior, making sure the simulation runs correctly without overlapping access or crashes.
 
 ---
-
-## 📜 License
-
-This project is part of the **42 School** educational program and is subject to its internal evaluation criteria.
-
----
-
-> ✨ Happy coding and enjoy the concurrency challenge!
