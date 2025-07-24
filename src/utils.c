@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 17:40:09 by paalexan          #+#    #+#             */
+/*   Updated: 2025/07/24 17:41:11 by paalexan         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/philosophers.h"
 
-// Checks if a string represents a positive integer
 int	is_positive_integer(const char *str)
 {
 	int	i;
@@ -17,7 +28,6 @@ int	is_positive_integer(const char *str)
 	return (SUCCESS);
 }
 
-// Gets argument name automatically for easier debugging
 const char	*get_arg_description(int index)
 {
 	if (index == 1)
@@ -36,7 +46,7 @@ const char	*get_arg_description(int index)
 long	current_timestamp_ms(void)
 {
 	struct timeval	tv;
-	long	ms;
+	long			ms;
 
 	gettimeofday(&tv, NULL);
 	ms = (tv.tv_sec * 1000L + tv.tv_usec / 1000L);
@@ -56,4 +66,19 @@ void	precise_sleep(t_simulation *sim, int duration_ms)
 			break ;
 		usleep(500);
 	}
+}
+
+void	print_state(t_philosopher *philo, const char *msg)
+{
+	t_simulation	*sim;
+	long			timestamp;
+
+	sim = philo->sim;
+	pthread_mutex_lock(&sim->print_mutex);
+	if (!sim->simulation_finished)
+	{
+		timestamp = current_timestamp_ms() - sim->start_timestamp;
+		printf("%ld %d %s\n", timestamp, philo->id, msg);
+	}
+	pthread_mutex_unlock(&sim->print_mutex);
 }

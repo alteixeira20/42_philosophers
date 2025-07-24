@@ -6,22 +6,16 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 13:06:16 by paalexan          #+#    #+#             */
-/*   Updated: 2025/07/24 17:30:17 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:39:57 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/philosophers.h"
 
-static int	init_forks(t_simulation *sim)
+static void	assign_forks(t_simulation *sim)
 {
 	int	i;
 
-	sim->forks = malloc(sizeof(pthread_mutex_t) * sim->num_philosophers);
-	if (!sim->forks)
-	{
-		printf("Error: malloc forks\n");
-		return (FAILURE);
-	}
 	i = 0;
 	while (i < sim->num_philosophers)
 	{
@@ -29,10 +23,21 @@ static int	init_forks(t_simulation *sim)
 		{
 			printf("Error: mutex init\n");
 			destroy_forks_on_failure(sim->forks, i);
-			return (FAILURE);
+			return ;
 		}
 		i++;
 	}
+}
+
+static int	init_forks(t_simulation *sim)
+{
+	sim->forks = malloc(sizeof(pthread_mutex_t) * sim->num_philosophers);
+	if (!sim->forks)
+	{
+		printf("Error: malloc forks\n");
+		return (FAILURE);
+	}
+	assign_forks(sim);
 	if (pthread_mutex_init(&sim->print_mutex, NULL) != 0)
 	{
 		printf("Error: mutex init\n");
@@ -67,7 +72,7 @@ static int	init_philosophers(t_simulation *sim)
 {
 	sim->philosophers = malloc(sizeof(t_philosopher) * sim->num_philosophers);
 	if (!sim->philosophers)
-	{	
+	{
 		printf("Error: malloc philosophers\n");
 		return (FAILURE);
 	}

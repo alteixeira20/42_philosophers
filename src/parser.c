@@ -6,13 +6,12 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 21:14:00 by paalexan          #+#    #+#             */
-/*   Updated: 2025/06/27 21:14:01 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:45:06 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/philosophers.h"
 
-// Parses a positive integer from a string.
 static int	parse_int(const char *str)
 {
 	long	num;
@@ -47,8 +46,9 @@ static int	validate_arguments(int argc, char **argv)
 		value = parse_int(argv[i]);
 		if (value <= 0)
 		{
-			printf("Error: argument '%s' ('%s') is out of bounds (>0 and <= INT_MAX)\n",
+			printf("Error: argument '%s' ('%s') ",
 				get_arg_description(i), argv[i]);
+			printf("is out of bounds (>0 and <= INT_MAX)\n");
 			return (FAILURE);
 		}
 		i++;
@@ -75,7 +75,8 @@ int	parse_args(t_simulation *sim, int argc, char **argv)
 {
 	if (argc != 5 && argc != 6)
 	{
-		printf("Usage: %s num_philosophers time_to_die time_to_eat time_to_sleep [num_must_eat]\n", argv[0]);
+		printf("Usage: %s num_philosophers ", argv[0]);
+		printf("time_to_die time_to_eat time_to_sleep [num_must_eat]\n");
 		return (FAILURE);
 	}
 	else

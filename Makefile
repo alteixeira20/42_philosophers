@@ -6,7 +6,7 @@
 #    By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/27 15:56:11 by paalexan          #+#    #+#              #
-#    Updated: 2025/06/27 17:47:56 by paalexan         ###   ########.fr        #
+#    Updated: 2025/07/24 17:31:59 by paalexan         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,6 @@ SRC			= $(SRC_DIR)/main.c \
 			  $(SRC_DIR)/routines.c \
 			  $(SRC_DIR)/monitor.c \
 			  $(SRC_DIR)/utils.c \
-			  $(SRC_DIR)/debug.c \
 			  $(SRC_DIR)/cleanup.c
 
 # **************************************************************************** #

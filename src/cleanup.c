@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 22:13:17 by paalexan          #+#    #+#             */
-/*   Updated: 2025/06/27 22:16:27 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:42:59 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	destroy_simulation(t_simulation *sim)
 void	destroy_forks_on_failure(pthread_mutex_t *forks, int count)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < count)
 	{

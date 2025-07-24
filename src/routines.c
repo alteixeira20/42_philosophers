@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 18:36:48 by paalexan          #+#    #+#             */
-/*   Updated: 2025/07/24 17:18:54 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:42:47 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,9 +94,8 @@ void	*philosopher_routine(void *arg)
 	{
 		take_forks_and_eat(philo);
 		if (sim->simulation_finished)
-			break;
+			break ;
 		sleep_and_think(philo);
 	}
 	return (NULL);
 }
-

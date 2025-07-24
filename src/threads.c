@@ -6,13 +6,12 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 20:47:44 by paalexan          #+#    #+#             */
-/*   Updated: 2025/06/27 22:00:08 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:42:25 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/philosophers.h"
 
-// Creates all philosophers threads
 int	create_philosopher_threads(t_simulation *sim)
 {
 	int	i;
@@ -22,9 +21,10 @@ int	create_philosopher_threads(t_simulation *sim)
 	while (i < sim->num_philosophers)
 	{
 		if (pthread_create(&sim->philosophers[i].thread, NULL,
-			philosopher_routine, &sim->philosophers[i]) != 0)
+				philosopher_routine, &sim->philosophers[i]) != 0)
 		{
-			printf("Error: failed to create thread for philosopher %i\n", i + 1);
+			printf("Error: failed to create thread for philosopher %i\n",
+				i + 1);
 			sim->simulation_finished = 1;
 			j = 0;
 			while (j < i)
