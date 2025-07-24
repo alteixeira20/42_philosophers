@@ -6,13 +6,12 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 13:06:16 by paalexan          #+#    #+#             */
-/*   Updated: 2025/06/28 14:05:21 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:30:17 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/philosophers.h"
 
-// Initializes and allocates all fork mutexes and the print mutex
 static int	init_forks(t_simulation *sim)
 {
 	int	i;
@@ -43,18 +42,10 @@ static int	init_forks(t_simulation *sim)
 	return (SUCCESS);
 }
 
-
-// Allocates and initializes philosoper structs
-static int	init_philosophers(t_simulation *sim)
+static void	create_philosophers(t_simulation *sim)
 {
 	int	i;
 
-	sim->philosophers = malloc(sizeof(t_philosopher) * sim->num_philosophers);
-	if (!sim->philosophers)
-	{	
-		printf("Error: malloc philosophers\n");
-		return (FAILURE);
-	}
 	i = 0;
 	while (i < sim->num_philosophers)
 	{
@@ -66,10 +57,21 @@ static int	init_philosophers(t_simulation *sim)
 		{
 			printf("Error: mutex init\n");
 			destroy_philosophers_on_failure(sim->philosophers, i);
-			return (FAILURE);
+			return ;
 		}
 		i++;
 	}
+}
+
+static int	init_philosophers(t_simulation *sim)
+{
+	sim->philosophers = malloc(sizeof(t_philosopher) * sim->num_philosophers);
+	if (!sim->philosophers)
+	{	
+		printf("Error: malloc philosophers\n");
+		return (FAILURE);
+	}
+	create_philosophers(sim);
 	if (pthread_mutex_init(&sim->print_mutex, NULL) != 0)
 	{
 		printf("Error: mutex init (print_mutex)\n");
@@ -79,13 +81,10 @@ static int	init_philosophers(t_simulation *sim)
 	return (SUCCESS);
 }
 
-// Initializes the simulation state, forks, and philosophers
 int	init_simulation(t_simulation *sim)
 {
 	sim->simulation_finished = 0;
 	sim->start_timestamp = current_timestamp_ms();
-
-	debug_print("Initiliazing forks...");
 	if (init_forks(sim) == FAILURE)
 		return (FAILURE);
 	if (pthread_mutex_init(&sim->eating_lock, NULL) != 0)
@@ -94,7 +93,6 @@ int	init_simulation(t_simulation *sim)
 		destroy_forks_on_failure(sim->forks, sim->num_philosophers);
 		return (FAILURE);
 	}
-	debug_print("Initiliazing philosophers...");
 	if (init_philosophers(sim) == FAILURE)
 	{
 		destroy_forks_on_failure(sim->forks, sim->num_philosophers);

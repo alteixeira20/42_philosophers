@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 18:36:48 by paalexan          #+#    #+#             */
-/*   Updated: 2025/06/28 17:54:26 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:18:54 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,47 +46,21 @@ static void	eat(t_philosopher *philo)
 	precise_sleep(sim, sim->time_to_eat);
 }
 
-static int	lock_second_fork(t_philosopher *philo, int first, int second)
-{
-	t_simulation	*sim;
-
-	sim = philo->sim;
-	while (!sim->simulation_finished)
-	{
-		if (pthread_mutex_trylock(&sim->forks[second]) == 0)
-		{
-			print_state(philo, "has taken a fork");
-			eat(philo);
-			pthread_mutex_unlock(&sim->forks[second]);
-			pthread_mutex_unlock(&sim->forks[first]);
-			return (SUCCESS);
-		}
-		usleep(100);
-	}
-	pthread_mutex_unlock(&sim->forks[first]);
-	return (FAILURE);
-}
-
-static int	take_forks(t_philosopher *philo)
+static void	take_forks_and_eat(t_philosopher *philo)
 {
 	t_simulation	*sim;
 	int				first;
 	int				second;
 
 	sim = philo->sim;
-	if (sim->simulation_finished)
-		return (FAILURE);
 	get_fork_indices(philo, &first, &second);
-	while (!sim->simulation_finished)
-	{
-		if (pthread_mutex_trylock(&sim->forks[first]) == 0)
-		{
-			print_state(philo, "has taken a fork");
-			return (lock_second_fork(philo, first, second));
-		}
-		usleep(100);
-	}
-	return (FAILURE);
+	pthread_mutex_lock(&sim->forks[first]);
+	print_state(philo, "has taken a fork");
+	pthread_mutex_lock(&sim->forks[second]);
+	print_state(philo, "has taken a fork");
+	eat(philo);
+	pthread_mutex_unlock(&sim->forks[second]);
+	pthread_mutex_unlock(&sim->forks[first]);
 }
 
 static void	sleep_and_think(t_philosopher *philo)
@@ -118,11 +92,11 @@ void	*philosopher_routine(void *arg)
 		usleep(1000);
 	while (!sim->simulation_finished)
 	{
-		if (take_forks(philo) == FAILURE)
-			break;
+		take_forks_and_eat(philo);
 		if (sim->simulation_finished)
 			break;
 		sleep_and_think(philo);
 	}
 	return (NULL);
 }
+
