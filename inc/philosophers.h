@@ -5,10 +5,10 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/27 12:43:14 by paalexan          #+#    #+#             */
-/*   Updated: 2025/06/28 16:25:31 by paalexan         ###   ########.fr       */
+/*   Created: 2025/08/04 16:58:27 by paalexan          #+#    #+#             */
+/*   Updated: 2025/08/04 17:08:38 by paalexan         ###   ########.fr       */
 /*                                                                            */
-/* ******************************************************** ****************** */
+/* ************************************************************************** */
 
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
@@ -46,9 +46,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-struct s_simulation;
+struct	s_simulation;
 
-typedef struct	s_philosopher
+typedef struct s_philosopher
 {
 	int					id;
 	int					meals_eaten;
@@ -58,10 +58,10 @@ typedef struct	s_philosopher
 	pthread_t			thread;
 	pthread_mutex_t		meal_mutex;
 
-	struct s_simulation *sim;
+	struct s_simulation	*sim;
 }	t_philosopher;
 
-typedef struct	s_simulation
+typedef struct s_simulation
 {
 	int				num_philosophers;
 	int				time_to_die;
@@ -79,7 +79,7 @@ typedef struct	s_simulation
 	t_philosopher	*philosophers;
 }	t_simulation;
 
-typedef enum	e_status
+typedef enum e_status
 {
 	ERROR	= -1,
 	SUCCESS = 0,
@@ -107,7 +107,6 @@ int			parse_args(t_simulation *sim, int argc, char **argv);
 /*                             Thread Management                              */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 int			create_philosopher_threads(t_simulation *sim);
 void		join_philosopher_threads(t_simulation *sim);
@@ -150,6 +149,7 @@ void		debug_simulation(t_simulation *sim);
 
 void		destroy_simulation(t_simulation *sim);
 void		destroy_forks_on_failure(pthread_mutex_t *forks, int count);
-void		destroy_philosophers_on_failure(t_philosopher *philosophers, int count);
+void		destroy_philosophers_on_failure(t_philosopher *philosophers,
+				int count);
 
 #endif
