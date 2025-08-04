@@ -3,6 +3,7 @@ import subprocess
 import sys
 import re
 import argparse
+import os
 from threading import Timer
 
 # ANSI colors
@@ -33,9 +34,32 @@ TESTS = [
     ("invalid negative must_eat", ["4", "600", "200", "200", "-5"], "error"),
 ]
 
+def select_binary():
+    has_mandatory = os.path.exists("../philo/philo")
+    has_bonus = os.path.exists("../philo_bonus/philo_bonus")
+
+    if has_mandatory and has_bonus:
+        print(f"{CYAN}Both mandatory and bonus binaries detected.{RESET}")
+        choice = input(f"{YELLOW}Which version do you want to test? (m = mandatory, b = bonus): {RESET}").strip().lower()
+        while choice not in ["m", "b"]:
+            choice = input(f"{RED}Invalid input. Please enter 'm' or 'b': {RESET}").strip().lower()
+        return "../philo/philo" if choice == "m" else "../philo_bonus/philo_bonus"
+    elif has_bonus:
+        print(f"{CYAN}Only bonus binary found. Testing bonus version...{RESET}")
+        return "../philo_bonus/philo_bonus"
+    elif has_mandatory:
+        print(f"{CYAN}Only mandatory binary found. Testing mandatory version...{RESET}")
+        return "../philo/philo"
+    else:
+        print(f"{RED}No philo or philo_bonus binary found. Please compile first.{RESET}")
+        sys.exit(1)
+
+# Default binary path, overridden by --bin if provided
+default_bin = select_binary()
+
 parser = argparse.ArgumentParser(description="42 Philosophers Tester (automatic)")
-parser.add_argument("--bin", default="../philo", help="Path to philo or philo_bonus binary (default: ../philo)")
-parser.add_argument("--repeat", type=int, default=3, help="Repetitions per test (default: 1)")
+parser.add_argument("--bin", default=default_bin, help="Path to philo or philo_bonus binary (default: auto-select)")
+parser.add_argument("--repeat", type=int, default=3, help="Repetitions per test (default: 3)")
 parser.add_argument("--timeout", type=int, default=10, help="Timeout in seconds per test (default: 10)")
 args = parser.parse_args()
 
@@ -53,13 +77,11 @@ def run_test(test_args, expected, timeout, binary):
     combined_output = out + err
     died_lines = [line for line in combined_output.splitlines() if "died" in line]
 
-    # Orphan process detection
     try:
         children = subprocess.check_output(["pgrep", "-P", str(proc.pid)])
         if children.strip():
             return False, "Orphan processes detected after termination:\n" + children.decode()
     except subprocess.CalledProcessError:
-        # pgrep returns non-zero if no children—this is good
         pass
 
     if "Error" in combined_output or "error" in combined_output:
@@ -71,7 +93,6 @@ def run_test(test_args, expected, timeout, binary):
     if expected == "error":
         return False, combined_output
 
-    # Parse eating counts
     eaten_counts = {}
     for line in combined_output.splitlines():
         m = re.match(r"\s*\d+\s+(\d+)\s+is eating", line)
@@ -88,7 +109,6 @@ def run_test(test_args, expected, timeout, binary):
     if expected == "stop":
         if died_lines:
             return False, "A philosopher died but should not have.\n\n" + combined_output
-        # If num_must_eat provided, check counts
         if len(test_args) == 5:
             try:
                 must_eat = int(test_args[4])
@@ -130,13 +150,11 @@ def main():
             color = GREEN if ok else RED
             print(f"  [{i+1}/{args.repeat}] {color}{result}{RESET}")
 
-    # Separate PASS and FAIL for clarity
     passed = [r for r in all_results if r[0] == "PASS"]
     failed = [r for r in all_results if r[0] == "FAIL"]
 
     print(f"\n{CYAN}=== TEST RESULTS SUMMARY ==={RESET}\n")
 
-    # Print all PASS
     print(f"{GREEN}--- PASSED TESTS ---{RESET}")
     for result, desc, *_ in passed:
         print(f"{GREEN}PASS{RESET} - {desc}")
