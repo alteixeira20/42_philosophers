@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 17:40:09 by paalexan          #+#    #+#             */
-/*   Updated: 2025/07/24 17:41:11 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/08/05 15:06:47 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,12 @@ void	precise_sleep(t_simulation *sim, int duration_ms)
 	long	now;
 
 	start = current_timestamp_ms();
-	while (!sim->simulation_finished)
+	while (1)
 	{
 		now = current_timestamp_ms();
 		if ((now - start) >= duration_ms)
+			break ;
+		if (is_simulation_finished(sim))
 			break ;
 		usleep(500);
 	}
@@ -74,11 +76,10 @@ void	print_state(t_philosopher *philo, const char *msg)
 	long			timestamp;
 
 	sim = philo->sim;
+	if (is_simulation_finished(sim))
+		return ;
 	pthread_mutex_lock(&sim->print_mutex);
-	if (!sim->simulation_finished)
-	{
-		timestamp = current_timestamp_ms() - sim->start_timestamp;
-		printf("%ld %d %s\n", timestamp, philo->id, msg);
-	}
+	timestamp = current_timestamp_ms() - sim->start_timestamp;
+	printf("%ld %d %s\n", timestamp, philo->id, msg);
 	pthread_mutex_unlock(&sim->print_mutex);
 }

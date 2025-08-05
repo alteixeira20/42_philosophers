@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 16:58:27 by paalexan          #+#    #+#             */
-/*   Updated: 2025/08/04 17:08:38 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/08/05 15:02:10 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ typedef struct s_simulation
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	eating_lock;
+	pthread_mutex_t	finish_mutex;
 
 	t_philosopher	*philosophers;
 }	t_simulation;
@@ -93,6 +94,8 @@ typedef enum e_status
 /* ************************************************************************** */
 
 int			init_simulation(t_simulation *sim);
+int			is_simulation_finished(t_simulation *sim);
+void		set_simulation_finished(t_simulation *sim, int status);
 
 /* ************************************************************************** */
 /*                                                                            */

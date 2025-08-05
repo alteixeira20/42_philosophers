@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 20:47:44 by paalexan          #+#    #+#             */
-/*   Updated: 2025/07/24 17:42:25 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/08/05 13:37:58 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ int	create_philosopher_threads(t_simulation *sim)
 		{
 			printf("Error: failed to create thread for philosopher %i\n",
 				i + 1);
+			pthread_mutex_lock(&sim->finish_mutex);
 			sim->simulation_finished = 1;
+			pthread_mutex_unlock(&sim->finish_mutex);
 			j = 0;
 			while (j < i)
 			{

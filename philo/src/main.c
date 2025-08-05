@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 17:38:26 by paalexan          #+#    #+#             */
-/*   Updated: 2025/07/24 17:33:44 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/08/05 15:03:04 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,23 @@ static int	run_simulation(t_simulation *sim)
 	pthread_join(monitor_thread, NULL);
 	join_philosopher_threads(sim);
 	return (SUCCESS);
+}
+
+int	is_simulation_finished(t_simulation *sim)
+{
+	int	finished;
+
+	pthread_mutex_lock(&sim->finish_mutex);
+	finished = sim->simulation_finished;
+	pthread_mutex_unlock(&sim->finish_mutex);
+	return (finished);
+}
+
+void	set_simulation_finished(t_simulation *sim, int status)
+{
+	pthread_mutex_lock(&sim->finish_mutex);
+	sim->simulation_finished = status;
+	pthread_mutex_unlock(&sim->finish_mutex);
 }
 
 int	main(int argc, char **argv)

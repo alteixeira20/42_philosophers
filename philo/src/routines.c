@@ -6,13 +6,26 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 18:36:48 by paalexan          #+#    #+#             */
-/*   Updated: 2025/07/24 17:42:47 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/08/05 15:07:23 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/philosophers.h"
 
-static void	get_fork_indices(t_philosopher *philo, int *first, int *second)
+static void	helper_eat(t_philosopher *philo, t_simulation *sim,
+			int left, int right)
+{
+	pthread_mutex_lock(&philo->meal_mutex);
+	philo->last_meal = current_timestamp_ms();
+	philo->meals_eaten++;
+	pthread_mutex_unlock(&philo->meal_mutex);
+	print_state(philo, "is eating");
+	precise_sleep(sim, sim->time_to_eat);
+	pthread_mutex_unlock(&sim->forks[left]);
+	pthread_mutex_unlock(&sim->forks[right]);
+}
+
+static void	eat(t_philosopher *philo)
 {
 	t_simulation	*sim;
 	int				left;
@@ -23,44 +36,20 @@ static void	get_fork_indices(t_philosopher *philo, int *first, int *second)
 	right = philo->id % sim->num_philosophers;
 	if (philo->id % 2 == 0)
 	{
-		*first = right;
-		*second = left;
+		pthread_mutex_lock(&sim->forks[right]);
+		print_state(philo, "has taken a fork right");
+		pthread_mutex_lock(&sim->forks[left]);
+		print_state(philo, "has taken a fork left");
 	}
 	else
 	{
-		*first = left;
-		*second = right;
+		usleep(500);
+		pthread_mutex_lock(&sim->forks[left]);
+		print_state(philo, "has taken a fork left");
+		pthread_mutex_lock(&sim->forks[right]);
+		print_state(philo, "has taken a fork right");
 	}
-}
-
-static void	eat(t_philosopher *philo)
-{
-	t_simulation	*sim;
-
-	sim = philo->sim;
-	pthread_mutex_lock(&philo->meal_mutex);
-	philo->last_meal = current_timestamp_ms();
-	pthread_mutex_unlock(&philo->meal_mutex);
-	print_state(philo, "is eating");
-	philo->meals_eaten++;
-	precise_sleep(sim, sim->time_to_eat);
-}
-
-static void	take_forks_and_eat(t_philosopher *philo)
-{
-	t_simulation	*sim;
-	int				first;
-	int				second;
-
-	sim = philo->sim;
-	get_fork_indices(philo, &first, &second);
-	pthread_mutex_lock(&sim->forks[first]);
-	print_state(philo, "has taken a fork");
-	pthread_mutex_lock(&sim->forks[second]);
-	print_state(philo, "has taken a fork");
-	eat(philo);
-	pthread_mutex_unlock(&sim->forks[second]);
-	pthread_mutex_unlock(&sim->forks[first]);
+	helper_eat(philo, sim, left, right);
 }
 
 static void	sleep_and_think(t_philosopher *philo)
@@ -90,10 +79,10 @@ void	*philosopher_routine(void *arg)
 	}
 	if (philo->id % 2 == 0)
 		usleep(1000);
-	while (!sim->simulation_finished)
+	while (!is_simulation_finished(sim))
 	{
-		take_forks_and_eat(philo);
-		if (sim->simulation_finished)
+		eat(philo);
+		if (is_simulation_finished(sim))
 			break ;
 		sleep_and_think(philo);
 	}

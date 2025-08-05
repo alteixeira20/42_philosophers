@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 13:06:16 by paalexan          #+#    #+#             */
-/*   Updated: 2025/07/24 17:39:57 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/08/05 15:02:34 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,17 @@ int	init_simulation(t_simulation *sim)
 		destroy_forks_on_failure(sim->forks, sim->num_philosophers);
 		return (FAILURE);
 	}
+	if (pthread_mutex_init(&sim->finish_mutex, NULL) != 0)
+	{
+		printf("Error: mutex init (finish_mutex)\n");
+		pthread_mutex_destroy(&sim->eating_lock);
+		destroy_forks_on_failure(sim->forks, sim->num_philosophers);
+		return (FAILURE);
+	}
 	if (init_philosophers(sim) == FAILURE)
 	{
+		pthread_mutex_destroy(&sim->finish_mutex);
+		pthread_mutex_destroy(&sim->eating_lock);
 		destroy_forks_on_failure(sim->forks, sim->num_philosophers);
 		return (FAILURE);
 	}
