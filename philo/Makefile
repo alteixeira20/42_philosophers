@@ -6,7 +6,7 @@
 #    By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/27 15:56:11 by paalexan          #+#    #+#              #
-#    Updated: 2025/07/24 17:31:59 by paalexan         ###   ########.fr        #
+#    Updated: 2025/08/05 15:15:46 by paalexan         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,6 +49,7 @@ SRC			= $(SRC_DIR)/main.c \
 # **************************************************************************** #
 
 OBJS		= $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+errors from 0 contexts (suppressed: 91708 from 40)
 
 # **************************************************************************** #
 #                                                                              #
@@ -57,7 +58,7 @@ OBJS		= $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 # **************************************************************************** #
 
 CC			= cc
-CFLAGS		= -Wall -Wextra -Werror
+CFLAGS		= -Wall -Wextra -Werror -pthread
 DFLAGS		= -g
 
 # **************************************************************************** #
@@ -70,6 +71,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@
 
+errors from 0 contexts (suppressed: 91708 from 40)
 all: $(NAME)
 
 $(NAME): $(OBJS)

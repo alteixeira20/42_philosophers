@@ -6,7 +6,7 @@
 /*   By: paalexan <paalexan@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 18:36:48 by paalexan          #+#    #+#             */
-/*   Updated: 2025/08/05 15:07:23 by paalexan         ###   ########.fr       */
+/*   Updated: 2025/08/05 15:13:06 by paalexan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,17 +37,17 @@ static void	eat(t_philosopher *philo)
 	if (philo->id % 2 == 0)
 	{
 		pthread_mutex_lock(&sim->forks[right]);
-		print_state(philo, "has taken a fork right");
+		print_state(philo, "has taken a fork");
 		pthread_mutex_lock(&sim->forks[left]);
-		print_state(philo, "has taken a fork left");
+		print_state(philo, "has taken a fork");
 	}
 	else
 	{
 		usleep(500);
 		pthread_mutex_lock(&sim->forks[left]);
-		print_state(philo, "has taken a fork left");
+		print_state(philo, "has taken a fork");
 		pthread_mutex_lock(&sim->forks[right]);
-		print_state(philo, "has taken a fork right");
+		print_state(philo, "has taken a fork");
 	}
 	helper_eat(philo, sim, left, right);
 }
