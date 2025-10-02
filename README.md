@@ -11,9 +11,9 @@
 <p align="center">Thread-safe dining simulation for 42 Porto's concurrency checkpoint.</p>
 
 <p align="center">
-  <img src="docs/images/running_tester.gif" width="85%" alt="Automated tester preview">
+  <img src="docs/images/running_philo.gif" width="85%" alt="Philosophers simulation preview">
   <br>
-  <em><sub>Preview accelerated 10× for demonstration purposes.</sub></em>
+  <em><sub>Running program with 5 philosopher, with 800ms of time to die, 200ms time to eat, 200ms time to sleep, ending when all have eaten 7 times.</sub></em>
 </p>
 
 ## Table of Contents
@@ -24,12 +24,13 @@
 5. [Repository Layout](#repository-layout)
 6. [Build & Integration](#build--integration)
 7. [Usage Guidelines](#usage-guidelines)
-8. [Feature Deep Dive](#feature-deep-dive)
-9. [Input & Timing Mechanics](#input--timing-mechanics)
-10. [Rendering & HUD](#rendering--hud)
-11. [Internal Architecture](#internal-architecture)
-12. [Tester Workflow](#tester-workflow)
-13. [Results & Reporting](#results--reporting)
+8. [Program Parameters](#program-parameters)
+9. [Feature Deep Dive](#feature-deep-dive)
+10. [Input & Timing Mechanics](#input--timing-mechanics)
+11. [Rendering & HUD](#rendering--hud)
+12. [Internal Architecture](#internal-architecture)
+13. [Tester Workflow](#tester-workflow)
+14. [Results & Reporting](#results--reporting)
 
 ## At a Glance
 > **Highlights:** Deterministic multithreading with focused tooling for peer evaluation.
@@ -62,6 +63,12 @@
 - `tester/tester.py` autodetects whether `philo` or `philo_bonus` is available and can be pointed to any binary with `--bin`.
 - Batches survival, starvation, and validation scenarios, repeating each test to reveal timing flukes, and flags orphan processes.
 - Color-coded summary keeps the focus on actionable failures (missing deaths, unexpected errors, or incomplete meal counts).
+
+<p align="center">
+  <img src="docs/images/running_tester.gif" width="85%" alt="Automated tester preview">
+  <br>
+  <em><sub>Preview accelerated 10× for demonstration purposes.</sub></em>
+</p>
 
 ```sh
 python3 tester/tester.py --bin ./philo/philo --repeat 2
@@ -105,15 +112,13 @@ make -C philo fclean
 ./philo/philo 5 800 200 200 7
 ```
 
-<details>
-<summary>Argument reference</summary>
-
-1. `number_of_philosophers`: also the fork count (>= 1).
-2. `time_to_die`: milliseconds without eating before a philosopher dies.
-3. `time_to_eat`: milliseconds spent eating while holding two forks.
-4. `time_to_sleep`: milliseconds spent sleeping before thinking again.
-5. `number_of_times_each_philosopher_must_eat` (optional): simulation stops when everyone reaches this count.
-</details>
+## Program Parameters
+> **Signature:** `./philo/philo number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]`
+- `number_of_philosophers`: total philosophers and forks taking part (>= 1).
+- `time_to_die`: milliseconds a philosopher may go without eating before dying.
+- `time_to_eat`: milliseconds spent eating while holding two forks.
+- `time_to_sleep`: milliseconds spent sleeping before thinking again.
+- `number_of_times_each_philosopher_must_eat` *(optional)*: simulation stops once every philosopher reaches this count.
 
 ## Feature Deep Dive
 > **Highlights:** Concurrency helpers keep the simulation predictable under load.
@@ -175,18 +180,18 @@ make -C philo fclean
 </details>
 
 ## Tester Workflow
-> **Highlights:** Mirrors what peers and Moulinette expect during defence.
-- Build the binary, then call the tester; it will prompt for mandatory vs bonus if both are present.
+> **Highlights:** Mirrors what peers expect during defence.
+- Build the binary, then call the tester from it's working directory; it will prompt for mandatory vs bonus if both are present.
 - Each scenario runs `repeat` times so intermittent race conditions surface quickly.
 - Failures print a focused context (death or missing meal logs) so you can iterate without scrolling through noise.
 
 ```sh
-make -C philo
-python3 tester/tester.py
+cd tester
+python3 tester.py
 ```
 
 ## Results & Reporting
-> **Highlights:** Output focuses on actionable signals for reviewers.
+> **Highlights:** Tester reports saved without noise to easy debugging
 - Simulation logs present only state transitions and the terminal death message—no debug noise unless `DEBUG_MODE` is toggled in the code.
 - Tester summary separates passes from failures and shows the command-line used, supporting reproducible reports.
 - When every philosopher meets the meal quota, the program exits silently after the last log, matching grading expectations.
